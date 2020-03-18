@@ -37,6 +37,7 @@ Labeling::Labeling()
 	cam  = 0;
 	thresh_param1 = 31;
 	thresh_param2 = 5;
+    polyApproximationDeltaFactor = 0.010;
 }
 
 Labeling::~Labeling()
@@ -118,7 +119,7 @@ void LabelingCvSeq::LabelSquares(IplImage* image, bool visualize)
         }
 
         CvSeq* result = cvApproxPoly(contours, sizeof(CvContour), storage,
-                                     CV_POLY_APPROX_DP, cvContourPerimeter(contours)*0.035, 0 ); // TODO: Parameters?
+                                     CV_POLY_APPROX_DP, cvContourPerimeter(contours) * polyApproximationDeltaFactor, 0 ); // TODO: Parameters?
 
         if( result->total == 4 && CheckBorder(result, image->width, image->height) && 
             fabs(cvContourArea(result,CV_WHOLE_SEQ)) > _min_area && // TODO check limits

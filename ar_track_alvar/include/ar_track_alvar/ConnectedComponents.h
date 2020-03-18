@@ -55,6 +55,7 @@ protected :
 
 	Camera	 *cam;
 	int thresh_param1, thresh_param2;
+    double polyApproximationDeltaFactor;
 
 public :
 

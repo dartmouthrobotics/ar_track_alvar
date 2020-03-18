@@ -303,27 +303,33 @@ double MultiMarker::_GetPose(MarkerIterator &begin, MarkerIterator &end, Camera*
 	}
 
 	// For every detected marker
-	for (MarkerIterator &i = begin.reset(); i != end; ++i)
+	for (MarkerIterator &marker = begin.reset(); marker != end; ++marker)
 	{
-		const Marker* marker = *i;
 		int id = marker->GetId();
-		int index = get_id_index(id);
-		if (index < 0) continue;
+		int marker_status_index = get_id_index(id);
+		if (marker_status_index < 0) {
+            continue;
+        }
 
 		// But only if we have corresponding points in the pointcloud
-		if (marker_status[index] > 0) {
+		if (marker_status[marker_status_index] > 0) {
 			for(size_t j = 0; j < marker->marker_corners.size(); ++j)
 			{
-				CvPoint3D64f Xnew = pointcloud[pointcloud_index(id, (int)j)];
-				world_points.push_back(Xnew);
+				CvPoint3D64f world_point = pointcloud[pointcloud_index(id, (int)j)];
+				world_points.push_back(world_point);
+
 				image_points.push_back(marker->marker_corners_img.at(j));
-				if (image) cvCircle(image, cvPoint(int(marker->marker_corners_img[j].x), int(marker->marker_corners_img[j].y)), 3, CV_RGB(0,255,0));
+				if (image) {
+                    cvCircle(image, cvPoint(int(marker->marker_corners_img[j].x), int(marker->marker_corners_img[j].y)), 3, CV_RGB(0,255,0));
+                }
 			}
-			marker_status[index] = 2; // Used for tracking
+			marker_status[marker_status_index] = 2; // Used for tracking
 		}
 	}
 
-	if (world_points.size() < 4) return -1;
+	if (world_points.size() < 4) {
+        return -1;
+    }
 
 	double rod[3], tra[3];
 	CvMat rot_mat = cvMat(3, 1,CV_64F, rod);
@@ -332,6 +338,7 @@ double MultiMarker::_GetPose(MarkerIterator &begin, MarkerIterator &end, Camera*
 	cam->CalcExteriorOrientation(world_points, image_points, &rot_mat, &tra_mat);
 	pose.SetRodriques(&rot_mat);
 	pose.SetTranslation(&tra_mat);
+
 	return error;
 }
 

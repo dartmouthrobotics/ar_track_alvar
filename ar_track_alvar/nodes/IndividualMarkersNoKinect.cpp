@@ -126,7 +126,6 @@ void getCapCallback (const sensor_msgs::ImageConstPtr & image_msg)
                 tf::Transform markerPose = t * m; // marker pose in the camera frame
 
                 tf::Vector3 z_axis_cam = tf::Transform(rotation, tf::Vector3(0,0,0)) * tf::Vector3(0, 0, 1);
-//                ROS_INFO("%02i Z in cam frame: %f %f %f",id, z_axis_cam.x(), z_axis_cam.y(), z_axis_cam.z());
                 /// as we can't see through markers, this one is false positive detection
                 if (z_axis_cam.z() > 0)
                 {
@@ -207,6 +206,8 @@ void getCapCallback (const sensor_msgs::ImageConstPtr & image_msg)
 			    ar_pose_marker.id = id;
 			    arPoseMarkers_.markers.push_back (ar_pose_marker);
 			}
+            arPoseMarkers_.header.stamp = image_msg->header.stamp;
+            arPoseMarkers_.header.seq = image_msg->header.seq;
 			arMarkerPub_.publish (arPoseMarkers_);
 		}
         catch (cv_bridge::Exception& e){
